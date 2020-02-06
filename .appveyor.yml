@@ -11,7 +11,8 @@ install:
   - ps: $App = Start-Process -FilePath java -ArgumentList "-jar ./artifacts/app-card-delivery.jar" -PassThru
 
 build_script:
-  - ps: chmod ./gradlew test --info "-Dselenide.headless=true"  # стартуем Selenide в Headless-режиме (см.ниже)
+  - ps: chmod +x ./gradlew
+  - ps: ./gradlew test --info "-Dselenide.headless=true"  # стартуем Selenide в Headless-режиме (см.ниже)
 
 on_finish:
   - ps: Stop-Process -Id $App.Id  # оставливаем SUT
