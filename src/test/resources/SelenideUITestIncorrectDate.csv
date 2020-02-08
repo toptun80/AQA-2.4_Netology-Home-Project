@@ -1,0 +1,6 @@
+city,date,name,phone,selector,expected
+"Омск","Latin","Ким Анна","+79040402204",".input[data-test-id=date], .input_invalid .input__sub","Неверно введена дата"
+"Омск","Русский","Ким Анна","+79040402204",".input[data-test-id=date], .input_invalid .input__sub","Неверно введена дата"
+"Омск","“[|]’~< !-@*$%^&#*()?>,.*/\\","Ким Аня","+79040402204",".input[data-test-id=date], .input_invalid .input__sub","Неверно введена дата"
+"Омск","121220020","Ким Анна","+79040402204",".input[data-test-id=date], .input_invalid .input__sub","на выбранную дату невозможен"
+"Омск","12.12.202","Ким Анна","+79040402204",".input[data-test-id=date], .input_invalid .input__sub","Неверно введена дата"
