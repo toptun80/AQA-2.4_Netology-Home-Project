@@ -2,7 +2,6 @@ package ru.netology.SelenideUITests;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import com.sun.istack.internal.NotNull;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -182,15 +181,16 @@ public class SelenideUITest {
     }
 
     @Test
+    @DisplayName("Проверка всплывающего окна Список городов")
     void checkCitiesPopup() {
         element(cityField).setValue("Ка");
-
         ElementsCollection cities = body.$$(".popup_height_adaptive .menu .menu-item__control");
         element(cities.get(4)).click();
         element(cityField).shouldHave(value("Казань"));
     }
 
     @Test
+    @DisplayName("Проверка всплывающего окна Календарь")
     void checkCalendarPopup() {
         element(cityField).setValue("Казань");
         form.$(".icon_name_calendar").click();
@@ -220,7 +220,6 @@ public class SelenideUITest {
         root.$(".notification").shouldHave(text("Встреча успешно забронирована на"));
     }
 
-    @NotNull
     boolean searchTargetDate(ElementsCollection dates, String targetDay) {
         for (SelenideElement date : dates) {
             String search = (date.getAttribute("data-day"));
