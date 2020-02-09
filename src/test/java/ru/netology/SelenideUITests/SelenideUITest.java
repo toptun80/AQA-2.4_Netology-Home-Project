@@ -1,6 +1,8 @@
 package ru.netology.SelenideUITests;
 
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import com.sun.istack.internal.NotNull;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.*;
-
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,13 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SelenideUITest {
     private SelenideElement form;
     private SelenideElement root;
-    private WebElement cityField;
-    private WebElement dateField;
-    private WebElement nameField;
-    private WebElement phoneField;
-    private WebElement checkbox;
-    private WebElement buttonNext;
+    private SelenideElement cityField;
+    private SelenideElement dateField;
+    private SelenideElement nameField;
+    private SelenideElement phoneField;
+    private SelenideElement checkbox;
+    private SelenideElement buttonNext;
     private LocalDate currentDate;
+    SelenideElement body;
 
     @BeforeAll
     static void setupAll() {
@@ -48,6 +49,7 @@ public class SelenideUITest {
         checkbox = form.$(".checkbox[data-test-id=agreement]");
         buttonNext = form.$(byText("Забронировать"));
         currentDate = LocalDate.now();
+        body = $("body");
     }
 
     @Test
@@ -177,5 +179,55 @@ public class SelenideUITest {
         checkbox.click();
         buttonNext.click();
         form.$(selector).shouldHave(text(expected));
+    }
+
+    @Test
+    void checkCitiesPopup() {
+        element(cityField).setValue("Ка");
+
+        ElementsCollection cities = body.$$(".popup_height_adaptive .menu .menu-item__control");
+        element(cities.get(4)).click();
+        element(cityField).shouldHave(value("Казань"));
+    }
+
+    @Test
+    void checkCalendarPopup() {
+        element(cityField).setValue("Казань");
+        form.$(".icon_name_calendar").click();
+        SelenideElement calendar = body.$(".popup_padded");
+        String dayStateCurrent = calendar.$(".calendar__day_state_current").getAttribute("data-day");
+        long unixDayStateCurrent = Long.parseLong(dayStateCurrent);
+        long unixFourDays = 345600000;
+        long targetUnixDay = unixDayStateCurrent + unixFourDays;
+        String targetDay = String.valueOf(targetUnixDay);
+        String selector = "[data-day='" + targetDay + "']";
+
+        while (true) {
+            ElementsCollection dates = calendar.$$("[data-day]");
+            if (searchTargetDate(dates, targetDay)) {
+                calendar.$(selector).click();
+                break;
+            } else {
+                calendar.$("[data-step='1']").click();
+            }
+        }
+
+        element(nameField).setValue("Ким Даша");
+        element(phoneField).setValue("+79040402204");
+        checkbox.click();
+        buttonNext.click();
+        root.$(".notification").waitUntil(visible, 15000);
+        root.$(".notification").shouldHave(text("Встреча успешно забронирована на"));
+    }
+
+    @NotNull
+    boolean searchTargetDate(ElementsCollection dates, String targetDay) {
+        for (SelenideElement date : dates) {
+            String search = (date.getAttribute("data-day"));
+            if (search.equals(targetDay)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
