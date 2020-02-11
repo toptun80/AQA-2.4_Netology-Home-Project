@@ -1,4 +1,4 @@
-package ru.netology.SelenideUITests;
+package ru.netology.selenideuitests;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
@@ -29,7 +29,7 @@ public class SelenideUITest {
     private SelenideElement checkbox;
     private SelenideElement buttonNext;
     private LocalDate currentDate;
-    SelenideElement body;
+    private SelenideElement body;
 
     @BeforeAll
     static void setupAll() {
