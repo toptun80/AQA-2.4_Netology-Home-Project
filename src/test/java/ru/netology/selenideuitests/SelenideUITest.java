@@ -185,7 +185,7 @@ public class SelenideUITest {
         String targetDay = String.valueOf(targetUnixDay);
         String selector = "[data-day='" + targetDay + "']";
 
-        while (!isNecessaryDateExists(calendar)) {
+        while (calendar.$$("[data-day]").size() < 5) {
             calendar.$("[data-step='1']").click();
         }
 
@@ -196,9 +196,5 @@ public class SelenideUITest {
         buttonNext.click();
         root.$(".notification").waitUntil(visible, 15000);
         root.$(".notification").shouldHave(text("Встреча успешно забронирована на"));
-    }
-
-    boolean isNecessaryDateExists(SelenideElement calendar) {
-        return calendar.$$("[data-day]").size() >= 5;
     }
 }
