@@ -185,11 +185,11 @@ public class SelenideUITest {
         String targetDay = String.valueOf(targetUnixDay);
         String selector = "[data-day='" + targetDay + "']";
 
-        while (!isNecessaryDateExists(calendar, targetDay)) {
+        while (!isNecessaryDateExists(calendar)) {
             calendar.$("[data-step='1']").click();
         }
-        calendar.$(selector).click();
 
+        calendar.$(selector).click();
         nameField.setValue("Ким Даша");
         phoneField.setValue("+79040402204");
         checkbox.click();
@@ -198,14 +198,7 @@ public class SelenideUITest {
         root.$(".notification").shouldHave(text("Встреча успешно забронирована на"));
     }
 
-    boolean isNecessaryDateExists(SelenideElement calendar, String targetDay) {
-        ElementsCollection dates = calendar.$$("[data-day]");
-        for (SelenideElement date : dates) {
-            String search = (date.getAttribute("data-day"));
-            if (search.equals(targetDay)) {
-                return true;
-            }
-        }
-        return false;
+    boolean isNecessaryDateExists(SelenideElement calendar) {
+        return calendar.$$("[data-day]").size() >= 5;
     }
 }
