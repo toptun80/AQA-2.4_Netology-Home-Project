@@ -20,35 +20,21 @@ import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SelenideUITest {
-    private SelenideElement form;
-    private SelenideElement root;
-    private SelenideElement cityField;
-    private SelenideElement dateField;
-    private SelenideElement nameField;
-    private SelenideElement phoneField;
-    private SelenideElement checkbox;
-    private SelenideElement buttonNext;
+    private SelenideElement root = $("#root");
+    private SelenideElement form = $("form");
+    private SelenideElement cityField = form.$("input[placeholder=Город]");
+    private SelenideElement dateField = form.$("input[placeholder='Дата встречи']");
+    private SelenideElement nameField = form.$("input[name=name]");
+    private SelenideElement phoneField = form.$("input[name=phone]");
+    private SelenideElement checkbox = form.$(".checkbox[data-test-id=agreement]");
+    private SelenideElement buttonNext = form.$(byText("Забронировать"));
+    private SelenideElement body = $("body");
     private LocalDate currentDate;
-    private SelenideElement body;
-
-    @BeforeAll
-    static void setupAll() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     @BeforeEach
     void setUp() {
         open("http://localhost:9999");
-        root = $("#root");
-        form = $("form");
-        cityField = form.$("input[placeholder=Город]");
-        dateField = form.$("input[placeholder='Дата встречи']");
-        nameField = form.$("input[name=name]");
-        phoneField = form.$("input[name=phone]");
-        checkbox = form.$(".checkbox[data-test-id=agreement]");
-        buttonNext = form.$(byText("Забронировать"));
         currentDate = LocalDate.now();
-        body = $("body");
     }
 
     @Test
@@ -56,17 +42,17 @@ public class SelenideUITest {
     void correctInputAfterIncorrect() {
         buttonNext.click();
         form.$("[data-test-id=city] .input__sub").shouldHave(text("Поле обязательно для заполнения"));
-        element(cityField).setValue("Казань");
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        cityField.setValue("Казань");
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
         buttonNext.click();
         form.$(".input[data-test-id=date], .input_invalid .input__sub").shouldHave(text("Неверно введена дата"));
-        element(dateField).setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        dateField.setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         buttonNext.click();
         form.$("[data-test-id=name] .input__sub").shouldHave(text("Поле обязательно для заполнения"));
-        element(nameField).setValue("Нефедова Алена");
+        nameField.setValue("Нефедова Алена");
         buttonNext.click();
         form.$("[data-test-id=phone] .input__sub").shouldHave(text("Поле обязательно для заполнения"));
-        element(phoneField).setValue("+79040402204");
+        phoneField.setValue("+79040402204");
         buttonNext.click();
         String color = form.$(".input_invalid .checkbox__text").getCssValue("color");
         assertEquals("rgba(255, 92, 92, 1)", color);
@@ -79,13 +65,13 @@ public class SelenideUITest {
     @Test
     @DisplayName("104 символа в поле ФИО")
     void input104CharsInNameField() {
-        element(cityField).setValue("Казань");
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        cityField.setValue("Казань");
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         for (int i = 0; i < 13; i++) {
-            element(nameField).setValue("Проверка");
+            nameField.setValue("Проверка");
         }
-        element(phoneField).setValue("+79040402204");
+        phoneField.setValue("+79040402204");
         checkbox.click();
         buttonNext.click();
         form.$("[data-test-id=name] .input__sub")
@@ -95,11 +81,11 @@ public class SelenideUITest {
     @Test
     @DisplayName("Минимальная дата + 1 день")
     void checkMinimalDatePlusOne() {
-        element(cityField).setValue("Казань");
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.plusDays(4).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        element(nameField).setValue("Ким Даша");
-        element(phoneField).setValue("+79040402204");
+        cityField.setValue("Казань");
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.plusDays(4).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        nameField.setValue("Ким Даша");
+        phoneField.setValue("+79040402204");
         checkbox.click();
         buttonNext.click();
         root.$(".notification").waitUntil(visible, 15000);
@@ -109,11 +95,11 @@ public class SelenideUITest {
     @Test
     @DisplayName("Минимальная дата + 1 год")
     void checkMinimalDatePlusYear() {
-        element(cityField).setValue("Казань");
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.plusYears(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        element(nameField).setValue("Ким Даша");
-        element(phoneField).setValue("+79040402204");
+        cityField.setValue("Казань");
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.plusYears(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        nameField.setValue("Ким Даша");
+        phoneField.setValue("+79040402204");
         checkbox.click();
         buttonNext.click();
         root.$(".notification").waitUntil(visible, 15000);
@@ -123,16 +109,16 @@ public class SelenideUITest {
     @Test
     @DisplayName("Раньше минимальной даты")
     void checkMinimalDate() {
-        element(cityField).setValue("Казань");
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        element(nameField).setValue("Ким Даша");
-        element(phoneField).setValue("+79040402204");
+        cityField.setValue("Казань");
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        nameField.setValue("Ким Даша");
+        phoneField.setValue("+79040402204");
         checkbox.click();
         buttonNext.click();
         form.$(".input[data-test-id=date], .input_invalid .input__sub").shouldHave(text("на выбранную дату невозможен"));
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.plusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         buttonNext.click();
         form.$(".input[data-test-id=date], .input_invalid .input__sub").shouldHave(text("на выбранную дату невозможен"));
     }
@@ -141,11 +127,11 @@ public class SelenideUITest {
     @DisplayName("Проверка позитивных сценариев")
     @CsvFileSource(resources = "/SelenideUITestPositiveData.csv", numLinesToSkip = 1)
     void checkHappyPathAppCardDeliveryService(String city, String name, String phone, String selector, String expected) {
-        element(cityField).setValue(city);
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        element(nameField).setValue(name);
-        element(phoneField).setValue(phone);
+        cityField.setValue(city);
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        nameField.setValue(name);
+        phoneField.setValue(phone);
         checkbox.click();
         buttonNext.click();
         root.$(selector).waitUntil(visible, 15000);
@@ -156,11 +142,11 @@ public class SelenideUITest {
     @DisplayName("Некорректный ввод даты")
     @CsvFileSource(resources = "/SelenideUITestIncorrectDate.csv", numLinesToSkip = 1)
     void checkIncorrectInputDate(String city, String date, String name, String phone, String selector, String expected) {
-        element(cityField).setValue(city);
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(date);
-        element(nameField).setValue(name);
-        element(phoneField).setValue(phone);
+        cityField.setValue(city);
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(date);
+        nameField.setValue(name);
+        phoneField.setValue(phone);
         checkbox.click();
         buttonNext.click();
         form.$(selector).shouldHave(text(expected));
@@ -170,11 +156,11 @@ public class SelenideUITest {
     @DisplayName("Проверка негативных сценариев")
     @CsvFileSource(resources = "/SelenideUITestWrongPath.csv", numLinesToSkip = 1)
     void checkWrongPathAppCardDeliveryService(String city, String name, String phone, String selector, String expected) {
-        element(cityField).setValue(city);
-        element(dateField).sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
-        element(dateField).setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        element(nameField).setValue(name);
-        element(phoneField).setValue(phone);
+        cityField.setValue(city);
+        dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
+        dateField.setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        nameField.setValue(name);
+        phoneField.setValue(phone);
         checkbox.click();
         buttonNext.click();
         form.$(selector).shouldHave(text(expected));
@@ -183,16 +169,16 @@ public class SelenideUITest {
     @Test
     @DisplayName("Проверка всплывающего окна Список городов")
     void checkCitiesPopup() {
-        element(cityField).setValue("Ка");
+        cityField.setValue("Ка");
         ElementsCollection cities = body.$$(".popup_height_adaptive .menu .menu-item__control");
-        element(cities.get(4)).click();
-        element(cityField).shouldHave(value("Казань"));
+        cities.get(4).click();
+        cityField.shouldHave(value("Казань"));
     }
 
     @Test
     @DisplayName("Проверка всплывающего окна Календарь")
     void checkCalendarPopup() {
-        element(cityField).setValue("Казань");
+        cityField.setValue("Казань");
         form.$(".icon_name_calendar").click();
         SelenideElement calendar = body.$(".popup_padded");
         String dayStateCurrent = calendar.$(".calendar__day_state_current").getAttribute("data-day");
@@ -212,8 +198,8 @@ public class SelenideUITest {
             }
         }
 
-        element(nameField).setValue("Ким Даша");
-        element(phoneField).setValue("+79040402204");
+        nameField.setValue("Ким Даша");
+        phoneField.setValue("+79040402204");
         checkbox.click();
         buttonNext.click();
         root.$(".notification").waitUntil(visible, 15000);
@@ -229,4 +215,6 @@ public class SelenideUITest {
         }
         return false;
     }
+
+
 }
