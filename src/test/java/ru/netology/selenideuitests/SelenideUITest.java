@@ -2,8 +2,6 @@ package ru.netology.selenideuitests;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,15 +60,14 @@ public class SelenideUITest {
         root.$(".notification").shouldHave(text("Встреча успешно забронирована на"));
     }
 
-    @Test
-    @DisplayName("104 символа в поле ФИО")
-    void input104CharsInNameField() {
+    @ParameterizedTest
+    @DisplayName("101 буква в поле ФИО")
+    @CsvFileSource(resources = "/tooManyInputCharactersData.csv", numLinesToSkip = 1)
+    void input101CharsInNameField(String longString) {
         cityField.setValue("Казань");
         dateField.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.DELETE));
         dateField.setValue(currentDate.plusDays(3).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        for (int i = 0; i < 13; i++) {
-            nameField.setValue("Проверка");
-        }
+        nameField.setValue(longString);
         phoneField.setValue("+79040402204");
         checkbox.click();
         buttonNext.click();
